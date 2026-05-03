@@ -1,0 +1,267 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents a user in the Examplify system.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "matricNumber": { "type": "string" },
+        "department": { "type": "string" },
+        "faculty": { "type": "string" },
+        "institution": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "location": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "instructor", "lecturer", "invigilator", "admin", "super-admin"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "role", "createdAt"]
+    },
+    "AccessCode": {
+      "title": "AccessCode",
+      "description": "A passcode for instructor/admin signup.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "role": { "type": "string", "enum": ["instructor", "lecturer", "invigilator", "admin", "super-admin"] },
+        "isUsed": { "type": "boolean" },
+        "usedBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "role", "isUsed", "createdAt", "createdBy"]
+    },
+    "Exam": {
+      "title": "Exam",
+      "description": "Represents an examination.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "integer" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "instructorId": { "type": "string" },
+        "studentIds": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "randomizeQuestions": { "type": "boolean" },
+        "randomizeOptions": { "type": "boolean" },
+        "remindersSent": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "List of reminder types already sent (e.g., 'start_1h', 'deadline_1h')"
+        }
+      },
+      "required": ["id", "title", "duration", "startTime", "endTime", "instructorId", "status", "createdAt"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "A single question.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "examId": { "type": "string" },
+        "text": { "type": "string" },
+        "type": { "type": "string", "enum": ["mcq", "true-false", "short-answer", "essay", "matching", "fill-blank", "multi-select", "reorder"] },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctOptionIndex": { "type": "integer" },
+        "correctOptionIndices": { "type": "array", "items": { "type": "integer" } },
+        "correctAnswer": { "type": "string" },
+        "correctAnswers": { "type": "array", "items": { "type": "string" } },
+        "matchingPairs": { "type": "array", "items": { "type": "object" } },
+        "points": { "type": "integer" },
+        "difficulty": { "type": "string", "enum": ["easy", "medium", "hard"] },
+        "category": { "type": "string" },
+        "wordLimit": { "type": "integer", "description": "Maximum word count for essay questions." },
+        "markingGuide": { "type": "string", "description": "Reference guide for grading essay questions." }
+      },
+      "required": ["id", "examId", "text", "type", "points", "difficulty"]
+    },
+    "Attempt": {
+      "title": "Attempt",
+      "description": "A student's attempt at an exam.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "examId": { "type": "string" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "score": { "type": "integer" },
+        "status": { "type": "string", "enum": ["started", "submitted", "graded"] },
+        "deviceInfo": { "type": "object" },
+        "violations": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["id", "studentId", "examId", "startTime", "status"]
+    },
+    "Answer": {
+      "title": "Answer",
+      "description": "A student's answer.",
+      "type": "object",
+      "properties": {
+        "attemptId": { "type": "string" },
+        "questionId": { "type": "string" },
+        "selectedOptionIndex": { "type": "integer" },
+        "selectedOptionIndices": { "type": "array", "items": { "type": "integer" } },
+        "shortAnswerText": { "type": "string" },
+        "essayText": { "type": "string" },
+        "fillBlankAnswers": { "type": "array", "items": { "type": "string" } },
+        "matchingAnswers": { "type": "object" },
+        "isCorrect": { "type": "boolean" },
+        "pointsEarned": { "type": "integer" }
+      },
+      "required": ["attemptId", "questionId", "isCorrect"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Record of administrative actions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "action": { "type": "string" },
+        "performedBy": { "type": "string" },
+        "performedByEmail": { "type": "string" },
+        "targetId": { "type": "string" },
+        "targetType": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "ipAddress": { "type": "string" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["id", "action", "performedBy", "performedByEmail", "details", "timestamp"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Global system configuration.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "maintenanceMode": { "type": "boolean" },
+        "allowRegistration": { "type": "boolean" },
+        "maxAttemptsPerExam": { "type": "integer" },
+        "securityLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+        "paystackPublicKey": { "type": "string" },
+        "paystackCurrency": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["id", "maintenanceMode", "allowRegistration", "maxAttemptsPerExam", "securityLevel", "updatedAt", "updatedBy"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "A question category (folder or topic).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "parentId": { "type": "string", "description": "ID of the parent category for nested folders." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "createdAt"]
+    },
+    "ExamTemplate": {
+      "title": "ExamTemplate",
+      "description": "A template for creating exams.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "integer" },
+        "passMark": { "type": "integer" },
+        "gradingScale": { "type": "array", "items": { "type": "object" } },
+        "randomizeQuestions": { "type": "boolean" },
+        "randomizeOptions": { "type": "boolean" },
+        "resultsReleased": { "type": "boolean" },
+        "questions": { "type": "array", "items": { "type": "object" } },
+        "instructorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "duration", "instructorId", "createdAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Examination announcements displayed to users.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "institutionName": { "type": "string" },
+        "courseName": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "targetTimestamp": { "type": "string", "format": "date-time" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "institutionName", "courseName", "date", "time", "isActive", "createdAt", "createdBy"]
+    },
+    "ExamDraft": {
+      "title": "ExamDraft",
+      "description": "An auto-saved draft of an exam being edited.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "examId": { "type": "string" },
+        "formData": { "type": "object" },
+        "step": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "formData", "updatedAt"]
+    },
+    "Advertisement": {
+      "title": "Advertisement",
+      "description": "A visual advertisement or announcement banner.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "linkUrl": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "displayType": { "type": "string", "enum": ["popup", "banner"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["id", "title", "imageUrl", "isActive", "displayType", "createdAt", "createdBy"]
+    },
+    "ExamMessage": {
+      "title": "ExamMessage",
+      "description": "A message sent between invigilator and student during an exam.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderRole": { "type": "string", "enum": ["student", "invigilator", "admin"] },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderId", "senderName", "senderRole", "text", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles." },
+    "/exams/{examId}": { "schema": "Exam", "description": "Exam definitions." },
+    "/questions/{questionId}": { "schema": "Question", "description": "Question bank items." },
+    "/registrations/{registrationId}": { "schema": "Registration", "description": "Student exam registrations." },
+    "/results/{resultId}": { "schema": "Result", "description": "Exam results." },
+    "/system_settings/{id}": { "schema": "SystemSettings", "description": "Global system settings." },
+    "/categories/{categoryId}": { "schema": "Category", "description": "Question categories." },
+    "/exam_templates/{templateId}": { "schema": "ExamTemplate", "description": "Exam templates for reuse." },
+    "/announcements/{announcementId}": { "schema": "Announcement", "description": "Global announcements." },
+    "/exam_drafts/{draftId}": { "schema": "ExamDraft", "description": "Drafts of exams." },
+    "/advertisements/{adId}": { "schema": "Advertisement", "description": "Promotional advertisements." },
+    "/audit_logs/{logId}": { "schema": "AuditLog", "description": "System-wide audit logs." },
+    "/access_codes/{codeId}": { "schema": "AccessCode", "description": "Passcodes for instructor/admin signup." },
+    "/attempts/{attemptId}": { "schema": "Attempt", "description": "Exam attempts." },
+    "/attempts/{attemptId}/messages/{messageId}": { "schema": "ExamMessage", "description": "Real-time messages for an exam attempt." }
+  }
+}
